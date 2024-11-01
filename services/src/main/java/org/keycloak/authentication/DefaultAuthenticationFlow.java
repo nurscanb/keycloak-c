@@ -89,6 +89,23 @@ public class DefaultAuthenticationFlow implements AuthenticationFlow {
             MultivaluedMap<String, String> inputData = processor.getRequest().getDecodedFormParameters();
             String authExecId = inputData.getFirst(Constants.AUTHENTICATION_EXECUTION);
 
+            if(inputData.containsKey("tcNo")){
+                model.setAuthenticator("auth-mobil-sign-form");
+            }
+//            else if(inputData.containsKey("esignAcceptedData")){
+//                String pinTextId =  ESignForm.fetchSignCompletedPinTextIdFromDb();
+//                String username = ESignForm.fetchSignCompletedUsernameFromDb();
+//                if (pinTextId != null){
+//                    inputData.add("pinTextId",pinTextId);
+//                    inputData.add("username",username);
+//                    System.out.println("inputData : " + inputData);
+//                }
+//                model.setAuthenticator("auth-e-sign-form");
+//            }
+            else if (inputData.containsKey("username") && inputData.containsKey("password")){
+                model.setAuthenticator("auth-username-password-form");
+            }
+
             // User clicked on "try another way" link
             if (inputData.containsKey("tryAnotherWay")) {
                 logger.trace("User clicked on link 'Try Another Way'");

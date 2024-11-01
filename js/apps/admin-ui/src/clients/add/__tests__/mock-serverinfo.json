@@ -251,6 +251,13 @@
         }
      ]
   },
+   "turksatProviders": [
+      {
+         "groupName":"Turksat",
+         "name":"Mobilsign",
+         "id":"mobilsign"
+      }
+   ],
   "socialProviders":[
      {
         "groupName":"Social",
@@ -398,6 +405,11 @@
         "groupName":"Social",
         "name":"StackOverflow",
         "id":"stackoverflow"
+     },
+     {
+        "groupName":"Turksat",
+        "name":"Mobilsign",
+        "id":"mobilsign"
      }
   ],
   "providers":{
@@ -1601,6 +1613,14 @@
            }
         }
      },
+     "turksat": {
+        "internal":true,
+        "providers": {
+           "mobilsign": {
+              "order": 0
+           }
+        }
+        },
      "stickySessionEncoder":{
         "internal":true,
         "providers":{

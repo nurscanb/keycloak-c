@@ -22,6 +22,8 @@ import { toIdentityProvider } from "../routes/IdentityProvider";
 import type { IdentityProviderCreateParams } from "../routes/IdentityProviderCreate";
 import { toIdentityProviders } from "../routes/IdentityProviders";
 import { GeneralSettings } from "./GeneralSettings";
+import {MobilsignGeneralSettings} from "./turksat/MobilsignGeneralSettings";
+import {EsignGeneralSettings} from "./turksat/EsignGeneralSettings";
 
 export default function AddIdentityProvider() {
   const { adminClient } = useAdminClient();
@@ -33,14 +35,22 @@ export default function AddIdentityProvider() {
 
   const providerInfo = useMemo(() => {
     const namespaces = [
+      "org.keycloak.broker.turksat.TurksatIdentityProvider",
       "org.keycloak.broker.social.SocialIdentityProvider",
       "org.keycloak.broker.provider.IdentityProvider",
     ];
 
     for (const namespace of namespaces) {
-      const social = serverInfo.componentTypes?.[namespace]?.find(
+
+      const turksat = serverInfo.componentTypes?.[namespace]?.find(
         ({ id }) => id === providerId,
       );
+      const social = serverInfo.componentTypes?.[namespace]?.find(
+          ({ id }) => id === providerId,
+      );
+      if (turksat) {
+        return turksat;
+      }
 
       if (social) {
         return social;
@@ -98,13 +108,32 @@ export default function AddIdentityProvider() {
           onSubmit={handleSubmit(onSubmit)}
         >
           <FormProvider {...form}>
-            <GeneralSettings id={providerId} />
-            {providerInfo && (
-              <DynamicComponents
-                stringify
-                properties={providerInfo.properties}
-              />
+            {providerId=="mobilsign" && (
+
+                <MobilsignGeneralSettings/>
+
             )}
+            {providerId=="esign" && (
+
+                <EsignGeneralSettings/>
+
+            )}
+
+            {!(providerId=="mobilsign" || "esign") && (
+                <>
+                  <GeneralSettings id={providerId} />
+                  {providerInfo && (
+                      <DynamicComponents properties={providerInfo.properties} />
+                  )}
+                </>
+            )}
+            {/*<GeneralSettings id={providerId} />*/}
+            {/*{providerInfo && (*/}
+            {/*  <DynamicComponents*/}
+            {/*    stringify*/}
+            {/*    properties={providerInfo.properties}*/}
+            {/*  />*/}
+            {/*)}*/}
           </FormProvider>
           <ActionGroup>
             <Button

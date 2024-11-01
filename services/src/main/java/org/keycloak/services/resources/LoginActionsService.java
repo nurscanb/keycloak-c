@@ -16,6 +16,7 @@
  */
 package org.keycloak.services.resources;
 
+import jakarta.ws.rs.Produces;
 import org.jboss.logging.Logger;
 import org.keycloak.common.Profile;
 import org.keycloak.common.Profile.Feature;
@@ -111,6 +112,12 @@ import jakarta.ws.rs.core.UriBuilder;
 import jakarta.ws.rs.core.UriBuilderException;
 import jakarta.ws.rs.core.UriInfo;
 import java.net.URI;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.keycloak.authentication.actiontoken.DefaultActionToken.ACTION_TOKEN_BASIC_CHECKS;
@@ -124,6 +131,8 @@ public class LoginActionsService {
     private static final Logger logger = Logger.getLogger(LoginActionsService.class);
 
     public static final String AUTHENTICATE_PATH = "authenticate";
+    public static final String MOBILSIGN_BACKEND_PATH = "mobilsignBackend";
+
     public static final String REGISTRATION_PATH = "registration";
     public static final String RESET_CREDENTIALS_PATH = "reset-credentials";
     public static final String REQUIRED_ACTION = "required-action";
@@ -340,6 +349,57 @@ public class LoginActionsService {
 
         return processAuthentication(actionRequest, execution, authSession, null);
     }
+    @Path(MOBILSIGN_BACKEND_PATH)
+    @POST
+    @Produces(MediaType.TEXT_PLAIN)
+    @Consumes(MediaType.TEXT_PLAIN)
+    public Response mobilsignBackendEndpoint(String path) {
+        String JDBC_URL = "jdbc:postgresql://localhost:5432/turksat";
+        final String USERNAME = "postgres";
+        String PASSWORD = "12345";
+        String sql = "INSERT INTO public.add_identity_provider_fields (field_name,category_id) VALUES (?,?)";
+
+        try (Connection connection = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD);
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setString(1, path);
+            ps.setInt(2,1);
+
+            int rowCount = ps.executeUpdate(); // Sorguyu çalıştır ve etkilenen satır sayısını al
+
+            System.out.println(rowCount + " satır eklendi.");
+            return Response.ok(201).build();
+        } catch (SQLException e) {
+            return Response.status(500).build();
+        }
+        // return Response.ok(201).build();
+    }
+
+    @GET
+    @Path("getMobilsignData")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getMobilsignDataFromTurksatDb(){
+        String JDBC_URL = "jdbc:postgresql://localhost:5432/turksat";
+        final String USERNAME = "postgres";
+        String PASSWORD = "12345";
+        try (Connection connection = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD)) {
+            String sql = "SELECT * FROM public.add_identity_provider_fields WHERE category_id=1 ORDER BY id DESC LIMIT 1";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            Map<String, Object> dataMap = new HashMap<>();
+            if (resultSet.next()) {
+                dataMap.put("field_name", resultSet.getString("field_name"));
+            } else {
+                return Response.status(404).build();
+            }
+            return Response.ok(dataMap.values().iterator().next()).build();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return Response.status(500).build();
+        }
+    }
 
     protected void processLocaleParam(AuthenticationSessionModel authSession) {
         LocaleUtil.processLocaleParam(session, realm, authSession);
@@ -549,7 +609,7 @@ public class LoginActionsService {
         return handleActionToken(key, execution, clientId, tabId, clientData, null);
     }
 
-    protected <T extends JsonWebToken & SingleUseObjectKeyModel> Response handleActionToken(String tokenString, String execution, String clientId, String tabId, String clientData, 
+    protected <T extends JsonWebToken & SingleUseObjectKeyModel> Response handleActionToken(String tokenString, String execution, String clientId, String tabId, String clientData,
             TriFunction<ActionTokenHandler<T>, T, ActionTokenContext<T>, Response> preHandleToken) {
         T token;
         ActionTokenHandler<T> handler;
@@ -781,7 +841,7 @@ public class LoginActionsService {
                                     @QueryParam(Constants.CLIENT_DATA) String clientData,
                                     @QueryParam(Constants.TAB_ID) String tabId,
                                     @QueryParam(Constants.TOKEN) String tokenString) {
-        
+
         if (Profile.isFeatureEnabled(Profile.Feature.ORGANIZATION) && tokenString != null) {
             //this call should extract orgId from token and set the organization to the session context
             preHandleActionToken(tokenString);

@@ -296,6 +296,9 @@
     { "groupName": "Social", "name": "PayPal", "id": "paypal" },
     { "groupName": "Social", "name": "StackOverflow", "id": "stackoverflow" }
   ],
+  "turksatProviders": [
+    { "groupName": "Turksat", "name": "Mobilsign", "id": "mobilsign" }
+  ],
   "identityProviders": [
     { "groupName": "User-defined", "name": "SAML v2.0", "id": "saml" },
     {
@@ -320,7 +323,8 @@
     { "groupName": "Social", "name": "Openshift v3", "id": "openshift-v3" },
     { "groupName": "Social", "name": "GitLab", "id": "gitlab" },
     { "groupName": "Social", "name": "PayPal", "id": "paypal" },
-    { "groupName": "Social", "name": "StackOverflow", "id": "stackoverflow" }
+    { "groupName": "Social", "name": "StackOverflow", "id": "stackoverflow" },
+    { "groupName": "Turksat", "name": "Mobilsign", "id": "mobilsign" }
   ],
   "providers": {
     "account": {
@@ -944,6 +948,12 @@
       "internal": true,
       "providers": { "infinispan": { "order": 1 } }
     },
+    "turksat": {
+      "internal": true,
+      "providers": {
+        "mobilsign": { "order": 0 }
+      }
+      },
     "social": {
       "internal": true,
       "providers": {

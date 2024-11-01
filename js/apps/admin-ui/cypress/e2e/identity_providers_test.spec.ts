@@ -75,6 +75,11 @@ describe("Identity provider test", () => {
     const identityProviderName = "github";
 
     describe("Custom fields tests", () => {
+      const turksatLoginIdentityProviders = [
+        { testName: "Mobilsign", displayName: "Mobilsign", alias: "mobilsign" },
+        { testName: "Esign", displayName: "Esign", alias: "esign" },
+
+      ];
       const socialLoginIdentityProviders = [
         { testName: "Bitbucket", displayName: "BitBucket", alias: "bitbucket" },
         { testName: "Facebook", displayName: "Facebook", alias: "facebook" },
@@ -107,7 +112,12 @@ describe("Identity provider test", () => {
         { testName: "Twitter", displayName: "Twitter", alias: "twitter" },
       ];
 
+
       after(async () => {
+        await Promise.all(
+            turksatLoginIdentityProviders.map((idp)=>
+                adminClient.deleteIdentityProvider(idp.alias))
+        )
         await Promise.all(
           socialLoginIdentityProviders.map((idp) =>
             adminClient.deleteIdentityProvider(idp.alias),

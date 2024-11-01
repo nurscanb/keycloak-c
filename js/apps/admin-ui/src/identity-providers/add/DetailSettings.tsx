@@ -64,6 +64,8 @@ import { OIDCAuthentication } from "./OIDCAuthentication";
 import { OIDCGeneralSettings } from "./OIDCGeneralSettings";
 import { ReqAuthnConstraints } from "./ReqAuthnConstraintsSettings";
 import { SamlGeneralSettings } from "./SamlGeneralSettings";
+import {EsignGeneralSettings} from "./turksat/EsignGeneralSettings";
+import {MobilsignGeneralSettings} from "./turksat/MobilsignGeneralSettings";
 
 type HeaderProps = {
   onChange: (value: boolean) => void;
@@ -261,15 +263,21 @@ export default function DetailSettings() {
   const serverInfo = useServerInfo();
   const providerInfo = useMemo(() => {
     const namespaces = [
+        "org.keycloak.broker.turksat.TurksatIdentityProvider",
       "org.keycloak.broker.social.SocialIdentityProvider",
       "org.keycloak.broker.provider.IdentityProvider",
     ];
 
     for (const namespace of namespaces) {
+      const turksat = serverInfo.componentTypes?.[namespace]?.find(
+          ({ id }) => id === providerId,
+      );
       const social = serverInfo.componentTypes?.[namespace]?.find(
         ({ id }) => id === providerId,
       );
-
+      if (turksat) {
+        return turksat;
+      }
       if (social) {
         return social;
       }
@@ -403,6 +411,8 @@ export default function DetailSettings() {
     return <KeycloakSpinner />;
   }
 
+  const isMobilsign = provider.providerId!.includes("mobilsign");
+  const isEsign = provider.providerId!.includes("esign");
   const isOIDC = provider.providerId!.includes("oidc");
   const isSAML = provider.providerId!.includes("saml");
   const isSocial = !isOIDC && !isSAML;
@@ -441,12 +451,18 @@ export default function DetailSettings() {
           isHorizontal
           onSubmit={handleSubmit(save)}
         >
-          {isSocial && <GeneralSettings create={false} id={providerId} />}
+          {!isOIDC && !isSAML && !isMobilsign && !isEsign &&(
+              <>
+                <GeneralSettings create={false} id={alias} />
+                {providerInfo && (
+                    <DynamicComponents properties={providerInfo.properties} />
+                )}
+              </>
+          )}
+          {isEsign && <EsignGeneralSettings urlRequired={true} create={true} />}
+          {isMobilsign && <MobilsignGeneralSettings urlRequired={true} create={true}/>}
           {isOIDC && <OIDCGeneralSettings />}
           {isSAML && <SamlGeneralSettings isAliasReadonly />}
-          {providerInfo && (
-            <DynamicComponents stringify properties={providerInfo.properties} />
-          )}
         </FormAccess>
       ),
     },

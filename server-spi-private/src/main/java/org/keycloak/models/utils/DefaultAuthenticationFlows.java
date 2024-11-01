@@ -348,6 +348,15 @@ public class DefaultAuthenticationFlows {
         execution.setAuthenticatorFlow(false);
         realm.addAuthenticatorExecution(execution);
 
+        //        // Mobil Sign processing
+        execution = new AuthenticationExecutionModel();
+        execution.setParentFlow(forms.getId());
+        execution.setRequirement(AuthenticationExecutionModel.Requirement.REQUIRED);
+        execution.setAuthenticator("auth-mobil-sign-form");
+        execution.setPriority(10);
+        execution.setAuthenticatorFlow(false);
+        realm.addAuthenticatorExecution(execution);
+
         AuthenticationFlowModel conditionalOTP = new AuthenticationFlowModel();
         conditionalOTP.setTopLevel(false);
         conditionalOTP.setBuiltIn(true);
