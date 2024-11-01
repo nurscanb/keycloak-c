@@ -25,6 +25,7 @@ import org.jboss.resteasy.reactive.NoCache;
 import org.keycloak.broker.provider.IdentityProvider;
 import org.keycloak.broker.provider.IdentityProviderFactory;
 import org.keycloak.broker.social.SocialIdentityProvider;
+import org.keycloak.broker.turksat.TurksatIdentityProvider;
 import org.keycloak.common.util.StreamUtil;
 import org.keycloak.connections.httpclient.HttpClientProvider;
 import org.keycloak.events.admin.OperationType;
@@ -264,6 +265,8 @@ public class IdentityProvidersResource {
 
     private Stream<ProviderFactory> getProviderFactories() {
         return Stream.concat(session.getKeycloakSessionFactory().getProviderFactoriesStream(IdentityProvider.class),
-                session.getKeycloakSessionFactory().getProviderFactoriesStream(SocialIdentityProvider.class));
+//                session.getKeycloakSessionFactory().getProviderFactoriesStream(SocialIdentityProvider.class)),
+                session.getKeycloakSessionFactory().getProviderFactoriesStream(TurksatIdentityProvider.class));
+
     }
 }

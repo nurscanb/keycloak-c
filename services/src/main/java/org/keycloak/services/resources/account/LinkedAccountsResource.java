@@ -38,6 +38,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriBuilder;
 import org.jboss.logging.Logger;
+import org.keycloak.broker.turksat.TurksatIdentityProvider;
 import org.keycloak.common.Profile;
 import org.keycloak.common.Profile.Feature;
 import org.keycloak.http.HttpRequest;
@@ -84,6 +85,8 @@ public class LinkedAccountsResource {
     private final RealmModel realm;
     private final Auth auth;
     private final Set<String> socialIds;
+    private final Set<String> turksatIds;
+
 
     public LinkedAccountsResource(KeycloakSession session,
                                   HttpRequest request,
@@ -97,6 +100,9 @@ public class LinkedAccountsResource {
         this.user = user;
         this.realm = session.getContext().getRealm();
         this.socialIds = session.getKeycloakSessionFactory().getProviderFactoriesStream(SocialIdentityProvider.class)
+                .map(ProviderFactory::getId)
+                .collect(Collectors.toSet());
+        this.turksatIds = session.getKeycloakSessionFactory().getProviderFactoriesStream(TurksatIdentityProvider.class)
                 .map(ProviderFactory::getId)
                 .collect(Collectors.toSet());
     }
@@ -165,7 +171,8 @@ public class LinkedAccountsResource {
         }
         LinkedAccountRepresentation rep = new LinkedAccountRepresentation();
         rep.setConnected(fedIdentity != null);
-        rep.setSocial(socialIds.contains(provider.getProviderId()));
+        rep.setTurksat(turksatIds.contains(provider.getProviderId()));
+        //rep.setSocial(socialIds.contains(provider.getProviderId()));
         rep.setProviderAlias(provider.getAlias());
         rep.setDisplayName(KeycloakModelUtils.getIdentityProviderDisplayName(session, provider));
         rep.setGuiOrder(provider.getConfig() != null ? provider.getConfig().get("guiOrder") : null);
@@ -212,7 +219,8 @@ public class LinkedAccountsResource {
 
         LinkedAccountRepresentation rep = new LinkedAccountRepresentation();
         rep.setConnected(identity != null);
-        rep.setSocial(socialIds.contains(provider.getProviderId()));
+        rep.setTurksat(turksatIds.contains(provider.getProviderId()));
+        //rep.setSocial(socialIds.contains(provider.getProviderId()));
         rep.setProviderAlias(providerAlias);
         rep.setDisplayName(displayName);
         rep.setGuiOrder(guiOrder);

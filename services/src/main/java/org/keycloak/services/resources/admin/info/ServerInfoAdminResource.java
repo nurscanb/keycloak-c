@@ -24,6 +24,7 @@ import org.jboss.resteasy.reactive.NoCache;
 import org.keycloak.broker.provider.IdentityProvider;
 import org.keycloak.broker.provider.IdentityProviderFactory;
 import org.keycloak.broker.social.SocialIdentityProvider;
+import org.keycloak.broker.turksat.TurksatIdentityProvider;
 import org.keycloak.common.Profile;
 import org.keycloak.common.Version;
 import org.keycloak.common.crypto.CryptoIntegration;
@@ -131,6 +132,7 @@ public class ServerInfoAdminResource {
                         );
         info.setCryptoInfo(createCryptoInfo(algorithms.get(false), algorithms.get(true)));
 
+        setTurksatProviders(info);
         setSocialProviders(info);
         setIdentityProviders(info);
         setThemes(info);
@@ -259,6 +261,11 @@ public class ServerInfoAdminResource {
         Stream<ProviderFactory> providerFactories = session.getKeycloakSessionFactory().getProviderFactoriesStream(SocialIdentityProvider.class);
         setIdentityProviders(providerFactories, info.getSocialProviders(), "Social");
     }
+    private void setTurksatProviders(ServerInfoRepresentation info) {
+        info.setTurksatProviders(new LinkedList<>());
+        Stream<ProviderFactory> providerFactories = session.getKeycloakSessionFactory().getProviderFactoriesStream(TurksatIdentityProvider.class);
+        setIdentityProviders(providerFactories, info.getTurksatProviders(), "Turksat");
+    }
 
     private void setIdentityProviders(ServerInfoRepresentation info) {
         info.setIdentityProviders(new LinkedList<>());
@@ -267,6 +274,9 @@ public class ServerInfoAdminResource {
 
         providerFactories = session.getKeycloakSessionFactory().getProviderFactoriesStream(SocialIdentityProvider.class);
         setIdentityProviders(providerFactories, info.getIdentityProviders(), "Social");
+
+        providerFactories = session.getKeycloakSessionFactory().getProviderFactoriesStream(TurksatIdentityProvider.class);
+        setIdentityProviders(providerFactories, info.getIdentityProviders(), "Turksat");
     }
 
     public void setIdentityProviders(Stream<ProviderFactory> factories, List<Map<String, String>> providers, String groupName) {

@@ -20,6 +20,7 @@ import org.jboss.logging.Logger;
 import org.jboss.resteasy.reactive.NoCache;
 import org.keycloak.authentication.authenticators.broker.IdpConfirmOverrideLinkAuthenticator;
 import org.keycloak.broker.provider.ExchangeTokenToIdentityProviderToken;
+import org.keycloak.broker.turksat.TurksatIdentityProvider;
 import org.keycloak.http.HttpRequest;
 import org.keycloak.OAuthErrorException;
 import org.keycloak.authentication.AuthenticationProcessor;
@@ -1330,7 +1331,8 @@ public class IdentityBrokerService implements IdentityProvider.AuthenticationCal
 
     public static IdentityProviderFactory<?> getIdentityProviderFactory(KeycloakSession session, IdentityProviderModel model) {
         return Stream.concat(session.getKeycloakSessionFactory().getProviderFactoriesStream(IdentityProvider.class),
-                session.getKeycloakSessionFactory().getProviderFactoriesStream(SocialIdentityProvider.class))
+                        session.getKeycloakSessionFactory().getProviderFactoriesStream(TurksatIdentityProvider.class))
+//                session.getKeycloakSessionFactory().getProviderFactoriesStream(SocialIdentityProvider.class)),
                 .filter(providerFactory -> Objects.equals(providerFactory.getId(), model.getProviderId()))
                 .map(IdentityProviderFactory.class::cast)
                 .findFirst()

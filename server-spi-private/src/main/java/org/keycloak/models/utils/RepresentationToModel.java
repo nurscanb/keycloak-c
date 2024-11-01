@@ -55,6 +55,7 @@ import org.keycloak.authorization.store.StoreFactory;
 import org.keycloak.broker.provider.IdentityProvider;
 import org.keycloak.broker.provider.IdentityProviderFactory;
 import org.keycloak.broker.social.SocialIdentityProvider;
+import org.keycloak.broker.turksat.TurksatIdentityProvider;
 import org.keycloak.client.clienttype.ClientType;
 import org.keycloak.client.clienttype.ClientTypeException;
 import org.keycloak.client.clienttype.ClientTypeManager;
@@ -852,9 +853,13 @@ public class RepresentationToModel {
         IdentityProviderFactory providerFactory = (IdentityProviderFactory) session.getKeycloakSessionFactory().getProviderFactory(
                 IdentityProvider.class, representation.getProviderId());
 
+//        if (providerFactory == null) {
+//            providerFactory = (IdentityProviderFactory) session.getKeycloakSessionFactory().getProviderFactory(
+//                    SocialIdentityProvider.class, representation.getProviderId());
+//        }
         if (providerFactory == null) {
             providerFactory = (IdentityProviderFactory) session.getKeycloakSessionFactory().getProviderFactory(
-                    SocialIdentityProvider.class, representation.getProviderId());
+                    TurksatIdentityProvider.class, representation.getProviderId());
         }
 
         if (providerFactory == null) {

@@ -37,6 +37,7 @@ import org.jboss.logging.Logger;
 import org.keycloak.broker.provider.IdentityProvider;
 import org.keycloak.broker.provider.IdentityProviderFactory;
 import org.keycloak.broker.social.SocialIdentityProvider;
+import org.keycloak.broker.turksat.TurksatIdentityProvider;
 import org.keycloak.connections.jpa.JpaConnectionProvider;
 import org.keycloak.models.IdentityProviderMapperModel;
 import org.keycloak.models.IdentityProviderStorageProvider;
@@ -552,8 +553,11 @@ public class JpaIdentityProviderStorageProvider implements IdentityProviderStora
 
         IdentityProviderFactory factory = (IdentityProviderFactory) session.getKeycloakSessionFactory().getProviderFactory(IdentityProvider.class, providerId);
         if (factory == null) {
-            factory = (IdentityProviderFactory) session.getKeycloakSessionFactory().getProviderFactory(SocialIdentityProvider.class, providerId);
+            factory = (IdentityProviderFactory) session.getKeycloakSessionFactory().getProviderFactory(TurksatIdentityProvider.class, providerId);
         }
+//        if (factory == null) {
+//            factory = (IdentityProviderFactory) session.getKeycloakSessionFactory().getProviderFactory(SocialIdentityProvider.class, providerId);
+//        }
 
         if (factory != null) {
             return factory.createConfig();

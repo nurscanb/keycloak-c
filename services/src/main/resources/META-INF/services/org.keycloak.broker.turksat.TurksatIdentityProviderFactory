@@ -1,0 +1,2 @@
+org.keycloak.turksat.mobilsign.MobilsignIdentityProviderFactory
+org.keycloak.turksat.esign.EsignIdentityProviderFactory
